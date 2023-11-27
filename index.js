@@ -43,6 +43,23 @@ app.post('/videos/', async (req, res) => {
     }
 })
 
+app.put('/videos/', async (req, res) => {
+    /*const id = req.params.id*/
+    const { id, titulo, descricao, url } = req.body;
+    try {
+        const [result] = await pool.query('UPDATE videos SET titulo = ?, descricao = ? , url = ? WHERE id = ?', [titulo, descricao, url, id]);
+        if (result.affectedRows > 0) {
+            res.status(200).send(result)
+        } else {
+            res.status(404).send(result)
+        }
+
+    } catch (error) {
+        console.error('Erro ao inserir dados', error);
+        res.status(500).send('Erro interno do servidor')
+    }
+})
+
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
