@@ -55,7 +55,23 @@ app.put('/videos/', async (req, res) => {
         }
 
     } catch (error) {
-        console.error('Erro ao inserir dados', error);
+        console.error('Erro ao editar dados', error);
+        res.status(500).send('Erro interno do servidor')
+    }
+})
+
+app.delete('/videos/:id', async (req, res) => {
+    const id = req.params.id
+    try {
+        const [result] = await pool.query('DELETE from videos WHERE id = ?', [id]);
+        if (result.affectedRows > 0) {
+            res.status(200).send(result)
+        } else {
+            res.status(404).send(result)
+        }
+
+    } catch (error) {
+        console.error('Erro ao deletar dados', error);
         res.status(500).send('Erro interno do servidor')
     }
 })
