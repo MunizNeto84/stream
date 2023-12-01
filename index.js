@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const pool = require('./db');
+const { check, validationResult } = require('express-validator');
 
 const app = express();
 const port = 3000;
@@ -32,7 +33,15 @@ app.get('/videos/:id', async (req, res) => {
     }
 })
 
-app.post('/videos/', async (req, res) => {
+app.post('/videos/', [
+    check('titulo').isString().notEmpty(),
+    check('descricao').isString().notEmpty(),
+    check('url').isURL()
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     const { titulo, descricao, url } = req.body;
     try {
         const [result] = await pool.query('INSERT INTO videos (titulo, descricao, url) VALUES (?, ?, ?)', [titulo, descricao, url]);
@@ -43,8 +52,16 @@ app.post('/videos/', async (req, res) => {
     }
 })
 
-app.put('/videos/', async (req, res) => {
-    /*const id = req.params.id*/
+app.put('/videos/', [
+    check('id').isString().notEmpty(),
+    check('titulo').isString().notEmpty(),
+    check('descricao').isString().notEmpty(),
+    check('url').isURL()
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     const { id, titulo, descricao, url } = req.body;
     try {
         const [result] = await pool.query('UPDATE videos SET titulo = ?, descricao = ? , url = ? WHERE id = ?', [titulo, descricao, url, id]);
